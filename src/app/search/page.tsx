@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { Search, MapPin, Navigation, ShoppingCart, Filter } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { mockPharmacies, mockProducts, mockStocks } from '@/lib/mockData'
 import { calculateDistance } from '@/lib/utils'
 import { toast } from "sonner"
+import { Pharmacy, UserLocation } from '@/types'
 
 const MapWithNoSSR = dynamic(() => import('@/components/patient/Map'), {
   ssr: false,
@@ -17,10 +18,10 @@ const MapWithNoSSR = dynamic(() => import('@/components/patient/Map'), {
 
 export default function SearchPage() {
   const { addToCart, setIsCartOpen, cart } = useCart()
-  const [pharmacies, setPharmacies] = useState([])
+  const [pharmacies, setPharmacies] = useState<Pharmacy[]>([])
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
-  const [userLocation, setUserLocation] = useState(null)
+  const [userLocation, setUserLocation] = useState<UserLocation | null>(null)
   const [showOnlyOpen, setShowOnlyOpen] = useState(false)
 
   const fetchData = async (query = '') => {
@@ -128,7 +129,7 @@ export default function SearchPage() {
     )
   }
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       fetchData(searchTerm)
     }

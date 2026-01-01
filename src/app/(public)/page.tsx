@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { Search, MapPin, Navigation, Filter } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { mockPharmacies, mockProducts, mockStocks } from '@/lib/mockData'
 import { calculateDistance } from '@/lib/utils'
 import { toast } from "sonner"
+import { Pharmacy, UserLocation } from '@/types'
 
 const MapWithNoSSR = dynamic(() => import('@/components/patient/Map'), {
   ssr: false,
@@ -15,17 +16,17 @@ const MapWithNoSSR = dynamic(() => import('@/components/patient/Map'), {
 })
 
 export default function Home() {
-  const [pharmacies, setPharmacies] = useState<any[]>([])
+  const [pharmacies, setPharmacies] = useState<Pharmacy[]>([])
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
-  const [userLocation, setUserLocation] = useState<any>(null) // { lat: ..., lng: ... }
+  const [userLocation, setUserLocation] = useState<UserLocation | null>(null)
   const [showOnlyOpen, setShowOnlyOpen] = useState(false)
 
   // --- 1. FONCTION DE RECHERCHE ---
   const fetchData = async (query = '') => {
     setLoading(true)
     try {
-      let dataToDisplay: any[] = []
+      let dataToDisplay: Pharmacy[] = []
 
       if (query === '') {
         // CAS 1 : Recherche vide -> On affiche tout
@@ -136,7 +137,7 @@ export default function Home() {
   }
 
   // --- 3. GESTION DE LA RECHERCHE (Touche Entrée) ---
-  const handleSearch = (e) => {
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       fetchData(searchTerm)
     }

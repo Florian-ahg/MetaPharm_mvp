@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Phone, MapPin, Clock, CheckCircle, XCircle, Package, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { Order } from '@/types'
 
 export default function SalesPage() {
-  const [orders, setOrders] = useState([])
+  const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
-  const [myPharmacyId, setMyPharmacyId] = useState(null) // Nouvel état pour stocker l'ID de ma pharmacie
+  const [myPharmacyId, setMyPharmacyId] = useState<number | null>(null)
 
   // --- 0. RÉCUPÉRER L'ID DE LA PHARMACIE CONNECTÉE ---
   useEffect(() => {
@@ -88,7 +89,7 @@ export default function SalesPage() {
 
 
   // 3. Action : Changer le statut (reste inchangé)
-  const updateStatus = async (orderId, newStatus) => {
+  const updateStatus = async (orderId: number, newStatus: Order['status']) => {
     setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o))
 
     const { error } = await supabase
@@ -138,8 +139,13 @@ export default function SalesPage() {
   )
 }
 
-// ... Le composant OrderCard et la fonction getStatusLabel restent inchangés ...
-function OrderCard({ order, onUpdateStatus }) {
+// Définir les props du composant OrderCard
+interface OrderCardProps {
+  order: Order;
+  onUpdateStatus: (id: number, status: Order['status']) => Promise<void>;
+}
+
+function OrderCard({ order, onUpdateStatus }: OrderCardProps) {
   const statusColors = {
     pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
     accepted: "bg-blue-100 text-blue-800 border-blue-200",
@@ -229,7 +235,7 @@ function OrderCard({ order, onUpdateStatus }) {
   )
 }
 
-function getStatusLabel(status) {
+function getStatusLabel(status: Order['status']) {
   switch (status) {
     case 'pending': return '⏳ En attente'
     case 'accepted': return ' En phase de Préparation' // Correction de faute de frappe ici
